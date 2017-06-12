@@ -26,7 +26,11 @@ function pad(s) {
 function formatEpoch(_date) {
     if(_date) {
         var dateObj = new Date(_date);
-        return dateObj.getFullYear() + '-' + pad((dateObj.getMonth()+1)) + '-' + pad(dateObj.getDay());
+        return (dateObj.getFullYear() + '-' +
+            pad((dateObj.getMonth()+1)) + '-' +
+            pad(dateObj.getDay()) + ' ' +
+            pad(dateObj.getHours()) + ':' +
+            pad(dateObj.getMinutes()));
     } else {
         return '-';
     }
@@ -39,6 +43,8 @@ function formatLocation(_report) {
     }
     return _report.zipCode + ', ' + _report.city + location;
 }
+
+var lastInfoWindow;
 
 // Loop through the results array and place a marker for each set of coordinates.
 function setMarkers (dayReportEntries) {
@@ -60,8 +66,7 @@ function setMarkers (dayReportEntries) {
 
       console.log("Adding content: " + contentString);
 
-      var coords = dayReportEntries[i].latlng;
-      var latLng = new google.maps.LatLng(coords[0],coords[1]);
+      var latLng = new google.maps.LatLng(dayReportEntries[i].latitude,dayReportEntries[i].longtitude);
       var marker = new google.maps.Marker({
         position: latLng,
         map: map,
@@ -71,6 +76,10 @@ function setMarkers (dayReportEntries) {
 
       google.maps.event.addListener(marker, 'click', (function(marker, content, infowindow) {
         return function() {
+            if(lastInfoWindow) {
+                lastInfoWindow.close();
+            }
+            lastInfoWindow = infowindow;
             infowindow.setContent(content);
             infowindow.open(map, marker);
         };
@@ -78,192 +87,4 @@ function setMarkers (dayReportEntries) {
     }
 }
 
-var staticdata = {
-                   "id": "9c948ec5-fb0b-4c15-9310-8854a698aa58",
-                   "region": "FYN",
-                   "date": 1496268000000,
-                   "dayReportEntries": [
-                     {
-                       "id": "03bce3d0-7bc9-4444-9758-d9237d6fc524",
-                       "region": "FYN",
-                       "type": "Indbrud i forretning",
-                       "zipCode": "5000",
-                       "city": "Odense",
-                       "location": "-",
-                       "reported": 1496304900000,
-                       "started": 1496251800000,
-                       "ended": 1496304000000,
-                       "description": "Indstigning bagdør, som var sparket ind. Bagdør gav adgang til baglokale, som også fungerer som lager. Alt var gennemrodet, kasser var smidt på gulvet, alle kasser med værdi var tømt. Kaffemaskine var ødelagt. Indgang til bagdør var via baggård, som var aflåst, men gerningsmand formentlig hoppet over hegnet. Stjålet skærmglas til iPads.",
-                       "latlng": [55.4098, 10.4033]
-                     },
-                     {
-                       "id": "083e69ed-e7aa-4473-9764-678fc23174ad",
-                       "region": "FYN",
-                       "type": "Brugstyveri af reg. motorcykel/scooter",
-                       "zipCode": "5000",
-                       "city": "Odense",
-                       "location": "-",
-                       "reported": 1496320560000,
-                       "started": 1496037600000,
-                       "ended": 1496257200000,
-                       "description": "Tyveri af AB23410, sort motorcykel af mrk. Ledow Borelli, årgang 2007. Stjålet uden rette nøgle. ",
-                       "latlng": [55.4098, 10.4033]
-                     },
-                     {
-                       "id": "10297a70-5f8a-4102-8c26-c81b3c8e5324",
-                       "region": "FYN",
-                       "type": "Vold mod polititjenestemand",
-                       "zipCode": "5000",
-                       "city": "Odense",
-                       "location": "-",
-                       "reported": 1496358900000,
-                       "started": 1496357580000,
-                       "ended": null,
-                       "description": "I forbindelse med løsladelse bed sigtede den forurettede polititjenestemand 3 gange. ",
-                       "latlng": [55.4098, 10.4033]
-                     },
-                     {
-                       "id": "390ae059-0c21-4e37-b666-b42b33dd5241",
-                       "region": "FYN",
-                       "type": "Butikstyveri",
-                       "zipCode": "5000",
-                       "city": "Odense",
-                       "location": "-",
-                       "reported": 1496307000000,
-                       "started": 1496307000000,
-                       "ended": null,
-                       "description": "Butikstyv havde været inde i forretning i ca. 3 kvarter. Hun betalte for en beklædningsgenstand, hvorefter hun forsøgte at forlade butikken med tasken fuld af tøj, der ikke var betalt for. Alarm blev udløst da hun forsøgte at forlade stedet.",
-                       "latlng": [55.4098, 10.4033]
-                     },
-                     {
-                       "id": "43156f83-0a2e-4b99-9169-0ae431bd2a75",
-                       "region": "FYN",
-                       "type": "Indbrud i privat beboelse",
-                       "zipCode": "5550",
-                       "city": "Langeskov",
-                       "location": "Grøntoften",
-                       "reported": 1496307540000,
-                       "started": 1496235600000,
-                       "ended": 1496266200000,
-                       "description": "Indstigning via hoveddør hvor gerningsmænd havde ødelagt låsen for at komme ind. Der var stjålet dab radio, smykker, sparegris, medicin, sølvtøj. ",
-                       "latlng": [55.3598167, 10.593153]
-                     },
-                     {
-                       "id": "4d806858-e69c-443e-9a84-8a8f331200e9",
-                       "region": "FYN",
-                       "type": "Hærværk, graffiti",
-                       "zipCode": "5700",
-                       "city": "Svendborg",
-                       "location": "Møllergade",
-                       "reported": 1496318700000,
-                       "started": 1495058400000,
-                       "ended": 1495092900000,
-                       "description": "På træ port ind til gård blev med grøn spraymaling skrevet diverse tegn/tags. På rød mur til højre for porten blev med grøn spraymaling skrevet diverse tegn.",
-                       "latlng": [55.0674, 10.6073]
-                     },
-                     {
-                       "id": "5f41069f-a14c-4384-8553-7302c71886d2",
-                       "region": "FYN",
-                       "type": "Indbrud i kælder-/lofts-/pulterrum",
-                       "zipCode": "5000",
-                       "city": "Odense",
-                       "location": "-",
-                       "reported": 1496340600000,
-                       "started": 1496262600000,
-                       "ended": 1496326500000,
-                       "description": "Stjålet fluestang mrk. Hardy Demon, fluestang mrk. Scierra, fluestang mrk. Guideline, fluestang mrk. TFO, fiskehjul mrk. Sage, fiskehjul mrk. Lamson, div. fiskegrej (fluebokse m.v.), løbesko mrk. Asics, løbesko mrk. Saucony, bore-/skruemaskine mrk. Dewalt, en kasse Cider. ",
-                       "latlng": [55.4098, 10.4033]
-                     },
-                     {
-                       "id": "5ff8e950-c87f-4008-bd46-869ffe792f46",
-                       "region": "FYN",
-                       "type": "Hærværk",
-                       "zipCode": "5000",
-                       "city": "Odense",
-                       "location": "-",
-                       "reported": 1496321460000,
-                       "started": 1496246400000,
-                       "ended": 1496296800000,
-                       "description": "Fjernet printplade i kompressor så køleanlæg til blomsterbutik blev stoppet. ",
-                       "latlng": [55.4098, 10.4033]
-                     },
-                     {
-                       "id": "92957aeb-b8e7-4751-b9df-7f0827cab15c",
-                       "region": "FYN",
-                       "type": "Indbrud i forretning",
-                       "zipCode": "5000",
-                       "city": "Odense",
-                       "location": "-",
-                       "reported": 1496293620000,
-                       "started": 1496239200000,
-                       "ended": 1496293200000,
-                       "description": "Indstigning: lås på port ind til gård var opbrudt. Stjålne genstande: Intet stjålet. ",
-                       "latlng": [55.4098, 10.4033]
-                     },
-                     {
-                       "id": "9b2a36ca-6227-45d4-a5f8-deb67d7d0967",
-                       "region": "FYN",
-                       "type": "Indbrud i privat beboelse",
-                       "zipCode": "5240",
-                       "city": "Odense",
-                       "location": "-",
-                       "reported": 1496301960000,
-                       "started": 1496293200000,
-                       "ended": 1496301600000,
-                       "description": "Indstigning: Formodentlig gennem terrassedør, blodspor på terrassedør og gulvet efter gerningsmanden som formentlig var blevet bidt af hunden i huset.",
-                       "latlng": [55.4166429, 10.454395]
-                     },
-                     {
-                       "id": "aa740ce8-10c5-4b19-80c9-64464bfdde09",
-                       "region": "FYN",
-                       "type": "Brugstyveri af reg. personbil",
-                       "zipCode": "5220",
-                       "city": "Odense",
-                       "location": "-",
-                       "reported": 1496290080000,
-                       "started": 1496235900000,
-                       "ended": 1496290080000,
-                       "description": "Hvid Toyota Yaris fra hjemmeplejen, stjålet med rette nøgle. Fundet på Herluf Trolles vej, Odense.",
-                       "latlng": [55.3632242, 10.4896986]
-                     },
-                     {
-                       "id": "c3bd60ad-8ad6-40dd-9e6b-75940a68bddb",
-                       "region": "FYN",
-                       "type": "Tyveri fra lastbil/varebil",
-                       "zipCode": "5580",
-                       "city": "Nørre",
-                       "location": "-",
-                       "reported": 1496310840000,
-                       "started": 1496253600000,
-                       "ended": 1496296800000,
-                       "description": "Plombe opbrudt på anhænger. Stjålet tøj fra firmaet Stylepit.",
-                       "latlng": [55.4724, 9.8733]
-                     },
-                     {
-                       "id": "cdbd6729-a0c1-4097-9e6d-7fb5a4fd1c11",
-                       "region": "FYN",
-                       "type": "Indbrud i privat beboelse",
-                       "zipCode": "5700",
-                       "city": "Svendborg",
-                       "location": "Svinget",
-                       "reported": 1496339100000,
-                       "started": 1496124000000,
-                       "ended": 1496332800000,
-                       "description": "Kældervindue forsøgt opbrudt. Rude knust og tegn på opbrydning af vinduet. Intet stjålet. ",
-                       "latlng": [55.0674, 10.6073]
-                     },
-                     {
-                       "id": "e2e00a29-6dd5-431b-977a-bb29f2194ab2",
-                       "region": "FYN",
-                       "type": "Tyveri fra lejlighed/værelse/etageejendom",
-                       "zipCode": "5881",
-                       "city": "Skårup",
-                       "location": "-",
-                       "reported": 1496328240000,
-                       "started": 1496311200000,
-                       "ended": 1496325600000,
-                       "description": "Chatol opbrudt. Stjålet lydkort mrk. Digidesign 003, samt konvolut med kontanter.",
-                       "latlng": [55.0829881, 10.6911431]
-                     }
-                   ]
-                 };
+var staticdata = {"id":"8337330c-b704-4db4-95b4-caee0b51f3f4","region":"FYN","date":1494021600000,"dayReportEntries":[{"id":"05e9490e-afe4-47b8-8161-43fa920691aa","region":"FYN","type":"Tyveri fra personbil","zipCode":"5800","city":"Nyborg","location":"Banegårdsalleen","reported":1493982900000,"started":1492752000000,"ended":1493150400000,"description":"Sølvgrå Mercedes-Benz A180. I forbindelse med hærværk blev det efterfølgende konstateret at en brobizz var stjålet. Rude knust i venstre fordør. ","latitude":55.30207,"longtitude":10.830866,"geocodeTries":1},{"id":"0a475593-7fe1-4dcf-9095-a3936e57b100","region":"FYN","type":"Færdselsuheld med personskade","zipCode":"5800","city":"Nyborg","location":"Skaboeshusevej","reported":1494028740000,"started":1494028740000,"ended":null,"description":"29-årig mand kørte på knallert ad Skaboeshusevej og kørte pludselig fra vejbanen og skråt ind over modsatte kørebane og ramte modsatte kantsten, hvorefter han kørte ned ad en skråning og væltede med knallerten. ","latitude":55.30207,"longtitude":10.830866,"geocodeTries":1},{"id":"0d31f0ae-593c-493d-9c0a-ff48ff04f08f","region":"FYN","type":"Indbrud i privat beboelse","zipCode":"5210","city":"Odense","location":"-","reported":1494025440000,"started":1494008100000,"ended":1494023640000,"description":"Indgang: Have-/terrassedør opbrudt. Stjålne genstande: Lampe.","latitude":55.419147,"longtitude":10.294271,"geocodeTries":1},{"id":"11373661-6f2d-4541-a50a-76a10daa4d40","region":"FYN","type":"Tyveri fra lomme/taske/bagage","zipCode":"5450","city":"Otterup","location":"Strandvejen","reported":1493996880000,"started":1493992500000,"ended":null,"description":"Mobiltelefon, Samsung 6, grå/sort. I telefonens omslag sad anmelders visa/dankort, kørekort og sygesikringsbevis. Taget fra jakkelomme og sket i forbindelse med indkøb.","latitude":55.49665,"longtitude":10.381878,"geocodeTries":1},{"id":"1258ed17-1c6b-4b4a-be0a-1e8a35213495","region":"FYN","type":"Indbrud i privat beboelse","zipCode":"5463","city":"Harndrup","location":"Vindebjergvej","reported":1494159540000,"started":1480575600000,"ended":1494158400000,"description":"Bagdør forsøgt brudt op. Træliste på dør flækket. Ingen indstigning. ","latitude":55.453445,"longtitude":10.018476,"geocodeTries":1},{"id":"153938af-6f1b-49e1-a24b-30f89bd439a9","region":"FYN","type":"Indbrud i kolonihavehus","zipCode":"5200","city":"Odense","location":"-","reported":1494130140000,"started":1494075600000,"ended":1494127800000,"description":"Hængsel på dør opbrudt. Stjålet 1 stk. Biltema generator og 1 stk. Samsung tv, ældre model. ","latitude":55.394833,"longtitude":10.316986,"geocodeTries":1},{"id":"1714f10e-e044-421b-8847-66279a14b755","region":"FYN","type":"Indbrud i privat beboelse","zipCode":"5771","city":"Stenstrup","location":"Rødmevej","reported":1493999940000,"started":1493200800000,"ended":1493999100000,"description":"Opbrudt kælderdør. Tappet ca. 400 liter fyringsolie fra olietank. Olien båret ud og der er spildt på kældergulv.","latitude":55.12772,"longtitude":10.505322,"geocodeTries":1},{"id":"1f10a8a1-7db0-4b10-960a-95cdec7ef11b","region":"FYN","type":"Indbrud i privat beboelse","zipCode":"5772","city":"Kværndrup","location":"Yderste","reported":1493966220000,"started":1493913600000,"ended":1493966700000,"description":"Indstigning: Hoveddør opbrudt. Stjålet: 2 vinduer, 2 terrassedøre, 1 hoveddør, stillads, kapsav, feincutter og dyksav ellers ikke overblik. ","latitude":55.17063,"longtitude":10.534364,"geocodeTries":1},{"id":"1f365169-2fa4-4342-8f89-c834a9f74455","region":"FYN","type":"Spirituskørsel","zipCode":"5700","city":"Svendborg","location":"Eggertsvej","reported":1494114120000,"started":1494113700000,"ended":null,"description":"Sigtede førte personbil i spirituspåvirket tilstand. Alkometertestet til 1,26 promille.","latitude":55.065,"longtitude":10.608502,"geocodeTries":1},{"id":"286bdc15-efdd-4847-b7f8-cbd7fee2df0d","region":"FYN","type":"Indbrud i privat beboelse","zipCode":"5462","city":"Morud","location":"Tevringevej","reported":1494104220000,"started":1494090000000,"ended":1494103800000,"description":"Indgang: Vindue opbrudt. Stjålne genstande: figurer, smykker og kontanter.","latitude":55.43588,"longtitude":10.183504,"geocodeTries":1},{"id":"28fd4900-6204-4c42-a30e-80725765b87e","region":"FYN","type":"Tricktyveri","zipCode":"5700","city":"Svendborg","location":"Vestergade","reported":1494149460000,"started":1494145800000,"ended":1494147600000,"description":"Tricktyveri og misbrug af hævekort. Anmelder oplyste, at hun havde været i Kvickly og handle. Da hun befinder sig på parkeringspladsen, bliver hun kontaktet af en udenlandsk - engelsk talende mand, som spurgte efter vej til sygehuset. Han havde svært ved at forstå hende, hvorfor han bad hende tegne ruten på en medbragt blok. Så det tog noget tid. Da han gik, var det ikke i retning mod sygehuset, hvilket undrede anmelder. Da anmelder kom hjem, fik hun en SMS fra NETS om at hendes kort måske var blevet misbrugt. ","latitude":55.065,"longtitude":10.608502,"geocodeTries":1},{"id":"29296cc9-83b4-4ee8-9984-2591c8763335","region":"FYN","type":"Spirituskørsel","zipCode":"5700","city":"Svendborg","location":"Jessens","reported":1494024720000,"started":1494024600000,"ended":null,"description":"Sigtede førte knallert i spirituspåvirket tilstand - alkometertestet til 0,95 promille. ","latitude":55.065,"longtitude":10.608502,"geocodeTries":1},{"id":"338dbe76-c98d-487b-a69d-54b21378be4a","region":"FYN","type":"Indbrud i privat beboelse","zipCode":"5300","city":"Kerteminde","location":"Andekæret","reported":1493979720000,"started":1493772540000,"ended":1493777400000,"description":"Indbrud i villa. Vindue til bryggers forsøgt brudt op uden held. Indgang via vindue på bagsiden af huset, skodde brudt op og vindue knust. Stjålet: 3 lamper, 1 lysestage. ","latitude":55.448135,"longtitude":10.652952,"geocodeTries":1},{"id":"37c14d91-44df-4f5c-9f42-dafe36f1209f","region":"FYN","type":"Vold","zipCode":"5330","city":"Munkebo","location":"Bycentret","reported":1494022740000,"started":1494022740000,"ended":null,"description":"Forurettede sad på en bænk og blev herefter angrebet med spark til hovedet. Efterfølgende opstod der tumult, hvorved forurettede fik nogle hudafskrabninger i panden / hovedet. ","latitude":55.442303,"longtitude":10.538919,"geocodeTries":1},{"id":"385ebece-5b6f-4a22-a6ee-da77d36ca638","region":"FYN","type":"Indbrud i privat beboelse","zipCode":"5330","city":"Munkebo","location":"Granhaven","reported":1494060600000,"started":1494043200000,"ended":1494050400000,"description":"Indgang: Vindue opbrudt. Stjålne genstande: 2 stk. lamper. ","latitude":55.442303,"longtitude":10.538919,"geocodeTries":1},{"id":"3b5fdf0c-1c82-4ab5-af6c-4049eca0fdde","region":"FYN","type":"Tyveri fra lastbil/varebil","zipCode":"5450","city":"Otterup","location":"Pileurten","reported":1494052080000,"started":1494003600000,"ended":1494051900000,"description":"Hvid Iveco. Låsen brudt op til førersiden og til bagdøren. Der var stjålet en GPS og el-værktøj fra bagagerum.","latitude":55.49665,"longtitude":10.381878,"geocodeTries":1},{"id":"3df70dca-2b18-4e60-966b-fd81242e77a8","region":"FYN","type":"Brand i køretøj","zipCode":"5240","city":"Odense","location":"-","reported":1494181320000,"started":1494181320000,"ended":null,"description":"Brand i knallert ved søen bag Bøgeparken.","latitude":55.41664,"longtitude":10.454395,"geocodeTries":1},{"id":"400bd656-fffe-484e-9753-b0819198fafc","region":"FYN","type":"Tyveri fra lastbil/varebil","zipCode":"5450","city":"Otterup","location":"Plantagevej","reported":1494058800000,"started":1494010800000,"ended":1494056700000,"description":"Tyveri fra varebil, Iveco Daily, rød. Bilens bagdør brudt op. Stjålet: div. El-værktøj - ej endeligt opgjort.","latitude":55.49665,"longtitude":10.381878,"geocodeTries":1},{"id":"4b42d852-45eb-4ecd-9f51-6fe84d6c24a0","region":"FYN","type":"Tricktyveri","zipCode":"5592","city":"Ejby","location":"Kingstrupvej","reported":1494089340000,"started":1494089340000,"ended":null,"description":"Tricktyveri i eget hjem. Gerningsmand (GM) går ind i ældre dames (Forurettede) ulåste hus, og udgiver sig for at være hjemmeplejen. GM lokker forurettede ud på badeværelset, imens en anden GM gennemsøger huset for værdier. Signalement: Udenlandsk udseende kvinde, muligt rumænsk, talte perfekt dansk, iklædt helt sort tøj, pæn/smart i tøjet, iført sort kasket. ","latitude":55.442062,"longtitude":9.944091,"geocodeTries":1},{"id":"4d473f88-1ec2-4a0c-a8c6-f25981cef4f1","region":"FYN","type":"Butikstyveri","zipCode":"5750","city":"Ringe","location":"Stationsvej","reported":1494078720000,"started":1494077400000,"ended":1494077700000,"description":"Tyveri cigaretter. Anmelder blev opholdt af A mens B stjal cigaretter fra tobaks bur. Signalement: A: mand, ca. 40 år, 180-185 cm høj, alm. af bygning. Sydeuropæisk udseende. Kort, sort hår. Talte gebrokkent engelsk.","latitude":55.23577,"longtitude":10.482967,"geocodeTries":1},{"id":"545ac31d-e25e-4e02-b1f7-422a945a370c","region":"FYN","type":"Indbrud i privat beboelse","zipCode":"5330","city":"Munkebo","location":"Næsset","reported":1494074520000,"started":1493546400000,"ended":1494073800000,"description":"Vindue forgæves forsøgt opbrudt, hvorved ruden blev knust. Stjålne genstande: udendørslampe i kobber.","latitude":55.442303,"longtitude":10.538919,"geocodeTries":1},{"id":"5a13fc11-1397-4e14-b590-6c78bcb5afec","region":"FYN","type":"Tyveri fra lastbil/varebil forsøg","zipCode":"5580","city":"Nørre","location":"-","reported":1493965440000,"started":1493928000000,"ended":1493956800000,"description":"Forsøg på tyveri: Anmelder oplyste han sov i sin lastbil på Lillebælt syd rasteplads. Da han skulle køre næste morgen opdagede han at nogen havde skåret et hul som en halv cirkel på ca. 15 cm i presenningen på hans trailer, blå sættevogn af mrk. Brdr. Platz. Intet stjålet. Gerningsmanden havde gjort det samme på en hel række lastbiler, ca. 15 stk., muligvis flere.","latitude":55.459705,"longtitude":9.875848,"geocodeTries":1},{"id":"617eb6a3-d592-4b22-9936-018c96474acc","region":"FYN","type":"Brugstyveri af andet motorkøretøj","zipCode":"5462","city":"Morud","location":"Blæsbjergvej","reported":1494043800000,"started":1494016200000,"ended":1494042600000,"description":"DY11184, lys blå Ford, traktor, årgang 1984 stjålet med rette nøgle. ","latitude":55.43588,"longtitude":10.183504,"geocodeTries":1},{"id":"6bf7b32e-d474-4d3e-a681-9f4df5153c45","region":"FYN","type":"Butikstyveri","zipCode":"5220","city":"Odense","location":"-","reported":1494072480000,"started":1494072480000,"ended":null,"description":"2 butikstyve tilbageholdt. De havde stjålet varer i Føtex for et samlet beløb på henholdsvis 516,90 og 779,80 kr.","latitude":55.363224,"longtitude":10.489698,"geocodeTries":1},{"id":"716d7e56-0616-401f-bc9d-a1eed6d8280d","region":"FYN","type":"Tyveri fra personbil","zipCode":"5856","city":"Ryslinge","location":"Ullemoseparken","reported":1493968500000,"started":1493958600000,"ended":null,"description":"AZ22877, Citroen C1, sort. Begge baghjul samt nummerplader var stjålet fra køretøjet.","latitude":55.24121,"longtitude":10.535757,"geocodeTries":1},{"id":"751114b6-71b9-4ffc-b1b5-1c6a868250a5","region":"FYN","type":"Tricktyveri","zipCode":"5471","city":"Søndersø","location":"Toftekær","reported":1493983980000,"started":1493899200000,"ended":1493901000000,"description":"2 engelsk talende kvinder havde snydt sig adgang til forurettedes hjem. De gik ind i huset uden at banke på, det eneste de sagde var Andersen. De gik ind i div. værelser selvom forurettede sagde nej gentagende gange Forurettede opdagede efterfølgende, at der manglede penge fra en pung. 2: Kvinder, asiatisk af udseende, 17-18 år, 160 cm, Kropsbygning: Almindelig, Hudfarve: Brun, Hårfarve: Brun, Talte: Engelsk.","latitude":55.485966,"longtitude":10.066761,"geocodeTries":1},{"id":"76c45aec-8f8a-4843-b623-9bccf37a91c5","region":"FYN","type":"Hærværk","zipCode":"5700","city":"Svendborg","location":"Tvedvej","reported":1494148440000,"started":1494090000000,"ended":1494146700000,"description":"Hærværk på personbil, Suzuki Swift. Bilens bagrude knust med en ølflaske. Der har været slået flere gange, og den knuste flaske ligger spredt ud over hele indkørslen. ","latitude":55.065,"longtitude":10.608502,"geocodeTries":1},{"id":"7742116f-3740-4ecb-b971-72c1dbe73de1","region":"FYN","type":"Indbrud i sommerhus","zipCode":"5600","city":"Faaborg","location":"Egholmvej","reported":1493996040000,"started":1492207200000,"ended":1493848740000,"description":"Indstigning via opbrudt vindue. Stjålet Philips 32” tv, boxerkort og kort modul. ","latitude":55.138027,"longtitude":10.235206,"geocodeTries":1},{"id":"7e7f9990-f6a9-4961-9a5a-46fe28994f8c","region":"FYN","type":"Brand i øvrigt","zipCode":"5580","city":"Nørre","location":"-","reported":1494181680000,"started":1494181680000,"ended":null,"description":"Brand i skovstykke beliggende tæt op af bebyggelse. Flere brande slukket af beboere på stedet.","latitude":55.459705,"longtitude":9.875848,"geocodeTries":1},{"id":"7eca8f98-b892-409a-b4ef-5c84e8b3b2b4","region":"FYN","type":"Tyveri fra personbil","zipCode":"5000","city":"Odense","location":"-","reported":1494001140000,"started":1493784000000,"ended":1494000600000,"description":"Volkswagen Golf Variant, sølvmetal. Muligt opbrud ved lås i førerside. Stjålet indbygget radio/GPS.","latitude":55.40984,"longtitude":10.403349,"geocodeTries":1},{"id":"815b2954-7d91-48e4-8bbf-ecaf5ed8132e","region":"FYN","type":"Tyveri fra lastbil/varebil","zipCode":"5700","city":"Svendborg","location":"Belvedere","reported":1494144900000,"started":1494075600000,"ended":1494144000000,"description":"Hvid Citroen Jumper. Værktøj stjålet fra bagagerum. ","latitude":55.065,"longtitude":10.608502,"geocodeTries":1},{"id":"81a20c68-ccea-4a8c-84dc-3ee50832895d","region":"FYN","type":"Spirituskørsel","zipCode":"5491","city":"Blommenslyst","location":"Fynske","reported":1494000000000,"started":1494000000000,"ended":null,"description":"Sigtede førte personbil mod øst ved Kildebjerg. Standset på afkørsel 53 (Blommenslyst). Alkometertestet til 1,70 o/oo.","latitude":55.390594,"longtitude":10.2349825,"geocodeTries":1},{"id":"8a907aae-d69f-49a6-9cd8-d40098da0d2b","region":"FYN","type":"Indbrud i privat beboelse","zipCode":"5210","city":"Odense","location":"-","reported":1494066000000,"started":1493985600000,"ended":1494064800000,"description":"Indstigning gennem soveværelsevinduet som var brudt op. Umiddelbart intet stjålet. ","latitude":55.419147,"longtitude":10.294271,"geocodeTries":1},{"id":"a2e16f7b-d579-4d63-ba82-11f9d7843a88","region":"FYN","type":"Indbrud i privat beboelse","zipCode":"5210","city":"Odense","location":"-","reported":1494021240000,"started":1494001800000,"ended":1494021000000,"description":"Rude i terrassedør knust. Stjålet 2 lamper, 55” tv og smykker.","latitude":55.419147,"longtitude":10.294271,"geocodeTries":1},{"id":"a57a1282-4fd9-4845-b46f-2564a94a4a23","region":"FYN","type":"Tyveri fra lastbil/varebil","zipCode":"5471","city":"Søndersø","location":"Holmevej","reported":1494154080000,"started":1494000000000,"ended":1494151200000,"description":"Iveco 35S, varebil, hvid. Skydedør i passagerside opbrudt. Stjålet: Kabelnedlægger til robotter mærket Honda/Stiga, Borsch Accu 36V boremaskine, Makita boremaskinesæt, Kabelsøgersæt og bærbar PC af mærket Lenovo.","latitude":55.485966,"longtitude":10.066761,"geocodeTries":1},{"id":"a6f43407-51f0-4e89-b2e1-edb9839f44f0","region":"FYN","type":"Indbrud i privat beboelse","zipCode":"5000","city":"Odense","location":"-","reported":1494011100000,"started":1493935140000,"ended":1494003600000,"description":"Indstigning via opbrudt dør til vaskerum/køkken. Stjålet: umiddelbart intet.","latitude":55.40984,"longtitude":10.403349,"geocodeTries":1},{"id":"a7f6b1e1-883c-4161-8831-fe8723cae9f6","region":"FYN","type":"Tyveri af cykel","zipCode":"5000","city":"Odense","location":"-","reported":1493995200000,"started":1493995200000,"ended":null,"description":"Sigtede klippede låsen over på en sort/rød herrecykel med en boltsaks og cyklede fra stedet. Boltsaks og bidetang udfundet i sigtedes rygsæk under visitation - konfiskeret.","latitude":55.40984,"longtitude":10.403349,"geocodeTries":1},{"id":"aea43a58-b821-4b27-b141-9ab091d804d2","region":"FYN","type":"Indbrud i privat beboelse","zipCode":"5240","city":"Odense","location":"-","reported":1493996340000,"started":1493996340000,"ended":null,"description":"Indgang: Vindue opbrudt. Stjålne genstande: Intet stjålet. ","latitude":55.41664,"longtitude":10.454395,"geocodeTries":1},{"id":"b0573b7e-5865-459a-8cc0-f1466e3eb2fc","region":"FYN","type":"Tricktyveri","zipCode":"5450","city":"Otterup","location":"Strandvejen","reported":1493997420000,"started":1493994600000,"ended":null,"description":"Forurettede udsat for tricktyveri af 3 personer. Der var fra lomme stjålet en Samsung mobiltelefon, som lå i et lædercover.","latitude":55.49665,"longtitude":10.381878,"geocodeTries":1},{"id":"b0f22233-9ec5-4d86-a6bf-fbe9290994f7","region":"FYN","type":"Indbrud i virksomhed","zipCode":"5700","city":"Svendborg","location":"Frilandsvej","reported":1493959200000,"started":1493908200000,"ended":1493953200000,"description":"Indgang: Vindue brudt op ind til kontor. Umiddelbart intet stjålet. ","latitude":55.065,"longtitude":10.608502,"geocodeTries":1},{"id":"b2b4f605-9d04-4f56-85d3-5a3ebc64b791","region":"FYN","type":"Hærværk","zipCode":"5492","city":"Vissenbjerg","location":"Sortenkærvej","reported":1494013920000,"started":1493924400000,"ended":1493998200000,"description":"Kæde ved indkørsel skåret over, ligesom 2 døre til toiletvogn var brudt op. ","latitude":55.38796,"longtitude":10.130924,"geocodeTries":1},{"id":"b4cba1bc-5f58-4bd2-a2d3-fe46b0138de5","region":"FYN","type":"Indbrud i forretning","zipCode":"5250","city":"Odense","location":"-","reported":1494111480000,"started":1494111480000,"ended":null,"description":"Tag gennembrydning. Stjålet: Principia racercykel hvid, Giant mountainbike grøn/sort. ","latitude":55.354183,"longtitude":10.303244,"geocodeTries":1},{"id":"bd736fbf-5589-480a-a561-2f90fcd4f106","region":"FYN","type":"Butikstyveri","zipCode":"5853","city":"Ørbæk","location":"Hovedgaden","reported":1494158100000,"started":1494158100000,"ended":null,"description":"Sigtede stjal 4 flasker spiritus. Eftersat af personalet, hvorunder han tabte 2 flasker. Erstatningskravet, 1746 kr. udredt med butikken og straks bøde på 2500 kr.","latitude":55.285698,"longtitude":10.676736,"geocodeTries":1},{"id":"c595553b-3c7e-485a-9da8-61d6db947454","region":"FYN","type":"Tyveri fra lastbil/varebil","zipCode":"5700","city":"Svendborg","location":"Marslevvej","reported":1494136560000,"started":1494104400000,"ended":1494132300000,"description":"Iveco, sort, varebil. Lås i skydedør i højreside taget ud. Stjålet: El-slagnøgle af mærket Metabo.","latitude":55.065,"longtitude":10.608502,"geocodeTries":1},{"id":"c5bc8a4c-a629-4a38-bfe2-fb2b9a8a5772","region":"FYN","type":"Brugstyveri af reg. personbil","zipCode":"5000","city":"Odense","location":"-","reported":1494036600000,"started":1493978400000,"ended":1494035100000,"description":"EF45529, metalblå Volkswagen Golf, personbil, årgang 1987.","latitude":55.40984,"longtitude":10.403349,"geocodeTries":1},{"id":"d65935ed-6148-4380-b1a0-7637de6af0fa","region":"FYN","type":"Hærværk","zipCode":"5874","city":"Hesselager","location":"Skolevej","reported":1493973360000,"started":1493388000000,"ended":1493617500000,"description":"Peugeot Partner, varebil. På dør bag førersædet er i lakken ridset.","latitude":55.171703,"longtitude":10.738388,"geocodeTries":1},{"id":"d65b9b55-81bb-4404-b942-622e8c808132","region":"FYN","type":"Tricktyveri","zipCode":"5900","city":"Rudkøbing","location":"Kohaven","reported":1494085140000,"started":1494083820000,"ended":null,"description":"forurettede opsøgt i egen bolig af en kvinde der havde mørkt hår opsat i nakken og bærende på et hvidt tørklæde med guldbesætninger. Hun udgav sig for at være læge og kom ind i forurettedes lejlighed. Her stjal hun et guldarmbånd og penge fra forurettede og forsvandt. ","latitude":54.94139,"longtitude":10.723017,"geocodeTries":1},{"id":"e1fc0eb9-22d7-4208-82df-93086ce6517f","region":"FYN","type":"Tricktyveri","zipCode":"5250","city":"Odense","location":"-","reported":1493994120000,"started":1493992800000,"ended":null,"description":"Forurettede havde været i Kvickly og handle. Da hun efterfølgende kom ud til sin bil og satte sine varer samt taske ind blev hun kontaktet af en udenlandsk mandsperson der spurgte om vej til OUH. Forurettede konstaterede efterfølgende af hendes lille var forsvundet fra bilen. A: Mand, 30-40 år, Kropsbygning: Spinkel, Hårfarve: Sort, Talte: Dansk med accent, Iført: Blå dunjakke. ","latitude":55.354183,"longtitude":10.303244,"geocodeTries":1},{"id":"e619f33a-ebf4-4367-a6eb-4e18bae5233b","region":"FYN","type":"Tricktyveri","zipCode":"5220","city":"Odense","location":"-","reported":1494070500000,"started":1494064800000,"ended":null,"description":"Fra pung i forurettedes taske havde 2 personer A og B stjålet dankort. A afledte forurettedes opmærksomhed, mens B tog forurettedes pung. Forurettede opdagede at pungen var væk og råbte op, hvorefter B lagde pungen fra sig og A og B løb væk. A: Kvinde, Romansk af udseende, 40 år, 165 cm, Kropsbygning: Spinkel, Hudfarve: Brun, Hårfarve: Sort, Yderligere kendetegn: Talte engelsk med accent. B: Mand, Romansk af udseende, 20 år, 180 cm, Kropsbygning: Spinkel, Hudfarve: Brun, Hårfarve: Sort, Hårlængde: Kort, Yderligere kendetegn: Sideskilning, lidt fald i håret, Iført: Mørkeblå eller sort fleece.","latitude":55.363224,"longtitude":10.489698,"geocodeTries":1},{"id":"e8f1d67e-ecfc-4ab3-8401-316aa75ef831","region":"FYN","type":"Indbrud i virksomhed","zipCode":"5260","city":"Odense","location":"-","reported":1494028920000,"started":1494028920000,"ended":null,"description":"Opklipning af perimeterhegn og efterfølgende opbrydning af skydedørsparti ved hovedindgangen. ","latitude":55.334064,"longtitude":10.37364,"geocodeTries":1},{"id":"eb862ff1-a930-41d0-8790-a91d8423752c","region":"FYN","type":"Indbrud i privat beboelse","zipCode":"5500","city":"Middelfart","location":"Kirsebærgrenen","reported":1494167040000,"started":1494154800000,"ended":1494166800000,"description":"Opbrudsmærker omkring lås på hoveddør, ligesom døren gabte. ","latitude":55.52158,"longtitude":9.766024,"geocodeTries":1},{"id":"f333a65e-530e-4f5a-b800-2aaa1e739162","region":"FYN","type":"Brugstyveri af reg. motorcykel/scooter","zipCode":"5240","city":"Odense","location":"-","reported":1494094260000,"started":1494090000000,"ended":1494093600000,"description":"Brugstyveri af AF15482, motorcykel Lifan LF 250, lilla, årgang 2007.","latitude":55.41664,"longtitude":10.454395,"geocodeTries":1},{"id":"f7d1e14e-249f-497d-b811-d02c7706ecbd","region":"FYN","type":"Butikstyveri","zipCode":"5230","city":"Odense","location":"-","reported":1494086700000,"started":1494086700000,"ended":null,"description":"2 mindreårige butikstyve stjal diverse kosmetik fra Bilka, Odense, til en værdi af kr. 997,00, med efterfølgende erstatningskrav på kr. 156,00 samt tyveri af diverse kosmetik fra Matas.","latitude":55.379063,"longtitude":10.40334,"geocodeTries":1},{"id":"fd265f2b-4c31-43a4-a304-b1ebb7db96f6","region":"FYN","type":"Tyveri fra personbil","zipCode":"5683","city":"Hårby","location":"Linien","reported":1494038700000,"started":1494028800000,"ended":1494037800000,"description":"Grå Peugeot 207. Forreste rude i passagersiden var knust. Fra bilen var stjålet en sort dametaske. ","latitude":55.22363,"longtitude":10.121683,"geocodeTries":1},{"id":"fdce0ae3-5fd3-4c8f-9b16-6b9f7efa4c4b","region":"FYN","type":"Brugstyveri af reg. personbil","zipCode":"5550","city":"Langeskov","location":"Jernbanegade","reported":1494059100000,"started":1493989200000,"ended":1494018000000,"description":"ZS55426 Citroen Xantia, personbil, bordeauxrød, årgang 1998.","latitude":55.361305,"longtitude":10.588296,"geocodeTries":1},{"id":"ff124e4a-5fc8-4e0d-92e3-0887ccf65b74","region":"FYN","type":"Tricktyveri","zipCode":"5500","city":"Middelfart","location":"Elmegade","reported":1494078000000,"started":1494075600000,"ended":1494076200000,"description":"Tyveri fra jakkelomme: brun dame læder pung. A: Mand, Dansk af udseende, 40-45 år, 185-190 cm, Kropsbygning: Almindelig, Hudfarve: Hvid, Hårfarve: Sort, Hårlængde: Kort, Talte: Dansk, Iført: Mørk jakke/trøje. B: Mand, Dansk af udseende, 40-45 år, 185-190 cm, Kropsbygning: Kraftig, Hudfarve: Hvid, Hårfarve: Sort, Hårlængde: Kort, Iført: Mørkt tøj.","latitude":55.52158,"longtitude":9.766024,"geocodeTries":1}]};
