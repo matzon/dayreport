@@ -1,0 +1,8 @@
+# Created by .ignore support plugin (hsz.mobi)
+.idea/
+target/
+/src/main/resources/config.properties
+/data/
+/logs/
+/dayreport.iml
+frontend/reports/
