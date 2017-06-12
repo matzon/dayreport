@@ -26,14 +26,11 @@ public abstract class DayReportAbstractRepositoryImpl<T> implements Repository<T
 
     @SuppressWarnings("unchecked")
     public List<T> findAll() {
-        List<T> result = withTransactionableSession(new TransactionableSession<List<T>>() {
-            @Override
-            public List<T> execute(Session _session, Transaction _transaction) {
-                Query query = _session.createQuery("from " + clazz.getName());
-                List list = query.list();
-                _transaction.commit();
-                return list;
-            }
+        List<T> result = withTransactionableSession((_session, _transaction) -> {
+            Query query = _session.createQuery("from " + clazz.getName());
+            List list = query.list();
+            _transaction.commit();
+            return list;
         });
 
         if (result == null) {
@@ -43,16 +40,13 @@ public abstract class DayReportAbstractRepositoryImpl<T> implements Repository<T
     }
 
     public List<T> findByDate(final Date _from, final Date _to) {
-        List<T> result = withTransactionableSession(new TransactionableSession<List<T>>() {
-            @Override
-            public List<T> execute(Session _session, Transaction _transaction) {
-                Query query = _session.createQuery("from " + clazz.getName() + " where date BETWEEN :fromDate AND :endDate");
-                query.setParameter("fromDate", _from);
-                query.setParameter("endDate", _to);
-                List list = query.list();
-                _transaction.commit();
-                return list;
-            }
+        List<T> result = withTransactionableSession((_session, _transaction) -> {
+            Query query = _session.createQuery("from " + clazz.getName() + " where date BETWEEN :fromDate AND :endDate");
+            query.setParameter("fromDate", _from);
+            query.setParameter("endDate", _to);
+            List list = query.list();
+            _transaction.commit();
+            return list;
         });
 
         if (result == null) {
@@ -62,53 +56,41 @@ public abstract class DayReportAbstractRepositoryImpl<T> implements Repository<T
     }
 
     public T save(final T _entity) {
-        return withTransactionableSession(new TransactionableSession<T>() {
-            @Override
-            public T execute(Session _session, Transaction _transaction) {
-                _session.saveOrUpdate(_entity);
-                _transaction.commit();
-                return _entity;
-            }
+        return withTransactionableSession((_session, _transaction) -> {
+            _session.saveOrUpdate(_entity);
+            _transaction.commit();
+            return _entity;
         });
     }
 
     public boolean delete(final T _entity) {
-        return withTransactionableSession(new TransactionableSession<Boolean>() {
-            @Override
-            public Boolean execute(Session _session, Transaction _transaction) {
-                _session.delete(_entity);
-                _transaction.commit();
-                return true;
-            }
+        return withTransactionableSession((_session, _transaction) -> {
+            _session.delete(_entity);
+            _transaction.commit();
+            return true;
         });
     }
 
     @Override
     public boolean saveAll(final List<T> _entities) {
-        return withTransactionableSession(new TransactionableSession<Boolean>() {
-            @Override
-            public Boolean execute(Session _session, Transaction _transaction) {
-                // TODO: 01-01-2017 - batch insert/update
-                for (T entry : _entities) {
-                    _session.saveOrUpdate(entry);
-                }
-                _transaction.commit();
-                return true;
+        return withTransactionableSession((_session, _transaction) -> {
+            // TODO: 01-01-2017 - batch insert/update
+            for (T entry : _entities) {
+                _session.saveOrUpdate(entry);
             }
+            _transaction.commit();
+            return true;
         });
     }
 
     @Override
     public T findLatest() {
-        List<T> result = withTransactionableSession(new TransactionableSession<List<T>>() {
-            @Override
-            public List<T> execute(Session _session, Transaction _transaction) {
-                Query query = _session.createQuery("from " + clazz.getName() + " order by date desc");
-                query.setMaxResults(1);
-                List list = query.list();
-                _transaction.commit();
-                return list;
-            }
+        List<T> result = withTransactionableSession((_session, _transaction) -> {
+            Query query = _session.createQuery("from " + clazz.getName() + " order by date desc");
+            query.setMaxResults(1);
+            List list = query.list();
+            _transaction.commit();
+            return list;
         });
 
         if (result == null || result.isEmpty()) {
@@ -117,7 +99,7 @@ public abstract class DayReportAbstractRepositoryImpl<T> implements Repository<T
         return result.get(0);
     }
 
-    private <S> S withTransactionableSession(TransactionableSession<S> _transactionableSession) {
+    <S> S withTransactionableSession(TransactionableSession<S> _transactionableSession) {
         Session currentSession = null;
         Transaction tx = null;
         S result = null;
@@ -137,7 +119,7 @@ public abstract class DayReportAbstractRepositoryImpl<T> implements Repository<T
         return result;
     }
 
-    private interface TransactionableSession<S> {
+    interface TransactionableSession<S> {
         S execute(Session _session, Transaction _transaction);
     }
 }

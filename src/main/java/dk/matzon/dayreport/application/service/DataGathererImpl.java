@@ -51,7 +51,7 @@ public class DataGathererImpl implements DataGatherer {
     }
 
     @Override
-    public void init() {
+    public void initialize() {
         LOGGER.info("initializing");
         scheduledFuture = scheduledExecutorService.scheduleAtFixedRate(new Runnable() {
             @Override

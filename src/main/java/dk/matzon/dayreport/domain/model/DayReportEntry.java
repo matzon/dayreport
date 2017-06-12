@@ -42,6 +42,11 @@ public class DayReportEntry implements Serializable {
     @Column(length = 2048)
     private String description;
 
+    private Float latitude;
+    private Float longtitude;
+
+    private Integer geocodeTries = 0;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "dayreport_id")
     private DayReport dayReport;
@@ -142,6 +147,30 @@ public class DayReportEntry implements Serializable {
         description = _description;
     }
 
+    public Float getLatitude() {
+        return latitude;
+    }
+
+    public void setLatitude(Float _latitude) {
+        latitude = _latitude;
+    }
+
+    public Float getLongtitude() {
+        return longtitude;
+    }
+
+    public void setLongtitude(Float _longtitude) {
+        longtitude = _longtitude;
+    }
+
+    public Integer getGeocodeTries() {
+        return geocodeTries;
+    }
+
+    public void setGeocodeTries(Integer _geocodeTries) {
+        geocodeTries = _geocodeTries;
+    }
+
     @JsonIgnore
     public DayReport getDayReport() {
         return dayReport;
@@ -162,12 +191,15 @@ public class DayReportEntry implements Serializable {
                 Objects.equals(started, that.started) &&
                 Objects.equals(ended, that.ended) &&
                 Objects.equals(description, that.description) &&
+                Objects.equals(latitude, that.latitude) &&
+                Objects.equals(longtitude, that.longtitude) &&
+                Objects.equals(geocodeTries, that.geocodeTries) &&
                 Objects.equals(dayReport, that.dayReport);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, region, type, zipCode, city, location, reported, started, ended, description, dayReport);
+        return Objects.hash(id, region, type, zipCode, city, location, reported, started, ended, description, latitude, longtitude, geocodeTries, dayReport);
     }
 
     @Override
@@ -183,6 +215,10 @@ public class DayReportEntry implements Serializable {
                 ", started=" + started +
                 ", ended=" + ended +
                 ", description='" + description + '\'' +
+                ", latitude=" + latitude +
+                ", longtitude=" + longtitude +
+                ", geocodeTries=" + geocodeTries +
+                ", dayReport=" + dayReport +
                 '}';
     }
 }

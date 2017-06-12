@@ -8,7 +8,7 @@ import java.util.Date;
  * Created by Brian Matzon <brian@matzon.dk>.
  */
 public interface DataGatherer {
-    void init();
+    void initialize();
 
     void shutdown();
 

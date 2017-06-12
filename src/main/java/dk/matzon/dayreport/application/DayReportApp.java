@@ -2,12 +2,15 @@ package dk.matzon.dayreport.application;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import dk.matzon.dayreport.application.service.DataGathererImpl;
+import dk.matzon.dayreport.application.service.GeocodingServiceImpl;
 import dk.matzon.dayreport.domain.DataGatherer;
+import dk.matzon.dayreport.domain.GeocodingService;
 import dk.matzon.dayreport.domain.Repository;
 import dk.matzon.dayreport.domain.model.DayReport;
 import dk.matzon.dayreport.domain.model.DayReportEntry;
 import dk.matzon.dayreport.domain.model.Region;
 import dk.matzon.dayreport.infrastructure.persistence.DayReportEntryRepositoryImpl;
+import dk.matzon.dayreport.infrastructure.persistence.DayReportRepositoryImpl;
 import dk.matzon.dayreport.infrastructure.persistence.HibernateUtil;
 import org.apache.commons.lang3.time.DateUtils;
 import org.apache.commons.lang3.time.DurationFormatUtils;
@@ -34,16 +37,19 @@ public class DayReportApp {
 
     private final ScheduledExecutorService scheduledExecutorService;
 
-    private Repository<dk.matzon.dayreport.domain.model.DayReport> repository;
+    private Repository<DayReport> dayReportRepository;
+    private Repository<DayReportEntry> dayReportEntryRepository;
 
     private DataGatherer dataGatherer;
+
+    private GeocodingService geocodingService;
 
     private volatile boolean active;
 
     public DayReportApp() {
         active = false;
         properties = new Properties();
-        scheduledExecutorService = Executors.newScheduledThreadPool(2);
+        scheduledExecutorService = Executors.newScheduledThreadPool(5);
     }
 
     private void init() throws IOException {
@@ -56,11 +62,16 @@ public class DayReportApp {
 
         // configure db
         SessionFactory sessionFactory = HibernateUtil.getSessionFactory();
-        repository = new DayReportEntryRepositoryImpl(sessionFactory);
+        dayReportRepository = new DayReportRepositoryImpl(sessionFactory);
+        dayReportEntryRepository = new DayReportEntryRepositoryImpl(sessionFactory);
 
         // configure data gather
-        dataGatherer = new DataGathererImpl(scheduledExecutorService, repository, properties);
-        dataGatherer.init();
+        dataGatherer = new DataGathererImpl(scheduledExecutorService, dayReportRepository, properties);
+        dataGatherer.initialize();
+
+        // configure geocoding service
+        geocodingService = new GeocodingServiceImpl(properties, (DayReportEntryRepositoryImpl) dayReportEntryRepository, scheduledExecutorService);
+        geocodingService.initialize();
 
         // configure backup
         scheduledExecutorService.scheduleAtFixedRate(new Runnable() {
@@ -115,17 +126,17 @@ public class DayReportApp {
                 dataGatherer.downloadData(lmfrom, lmto, region);
                 break;
             case "list":
-                all = repository.findAll();
+                all = dayReportRepository.findAll();
                 for (DayReport dayReport : all) {
                     System.out.println(dayReport);
                 }
                 break;
             case "latest":
-                DayReport latest = repository.findLatest();
+                DayReport latest = dayReportRepository.findLatest();
                 System.out.println(latest);
                 break;
             case "types":
-                all = repository.findAll();
+                all = dayReportRepository.findAll();
                 Set<String> types = new HashSet<>();
                 for (DayReport dayReport : all) {
                     List<DayReportEntry> dayReportEntries = dayReport.getDayReportEntries();
@@ -143,6 +154,14 @@ public class DayReportApp {
             case "dump":
                 dumpReports();
                 break;
+            case "geolookup":
+                geocodingService.processEntriesMissingGeocodeInformation();
+            case "geoerror":
+                List<DayReportEntry> failingGeocodeEntries = geocodingService.findFailingGeocodeEntries();
+                for (DayReportEntry failingGeocodeEntry : failingGeocodeEntries) {
+                    System.out.println("Failed geocode for zipCode: " + failingGeocodeEntry.getZipCode() + ", city: " + failingGeocodeEntry.getCity() + ", location: " + failingGeocodeEntry.getLocation());
+                }
+                break;
             default:
                 System.out.println("Unknown command '" + command[0] + "'");
                 break;
@@ -153,7 +172,7 @@ public class DayReportApp {
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
         ObjectMapper objectMapper = new ObjectMapper();
 
-        List<DayReport> all = repository.findAll();
+        List<DayReport> all = dayReportRepository.findAll();
         for (DayReport dayReport : all) {
             Date reportDate = dayReport.getDate();
             Region region = dayReport.getRegion();
