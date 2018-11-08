@@ -218,7 +218,6 @@ public class DayReportEntry implements Serializable {
                 ", latitude=" + latitude +
                 ", longtitude=" + longtitude +
                 ", geocodeTries=" + geocodeTries +
-                ", dayReport=" + dayReport +
                 '}';
     }
 }
