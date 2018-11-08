@@ -173,15 +173,26 @@ public class DayReportApp {
         ObjectMapper objectMapper = new ObjectMapper();
 
         List<DayReport> all = dayReportRepository.findAll();
+        Map<Region, List<String>> regionDates = new HashMap<>();
         for (DayReport dayReport : all) {
             Date reportDate = dayReport.getDate();
             Region region = dayReport.getRegion();
             String path = "data/reports/" + region.name() + "/";
             ensurePath(path);
-            File file = new File(path + sdf.format(reportDate) + ".json");
+            String dateName = sdf.format(reportDate);
+            File file = new File(path + dateName + ".json");
             System.out.println("Dumping " + dayReport.getDate() + " to " + file.getAbsolutePath());
             objectMapper.writeValue(file, dayReport);
+            addRegionDate(regionDates, region, dateName);
         }
+
+        System.out.println("Writing summary file");
+        File summaryFile = new File("data/reports/summary.json");
+        objectMapper.writeValue(summaryFile, regionDates);
+    }
+
+    private void addRegionDate(Map<Region, List<String>> _regionDates, Region _region, String _dateName) {
+        _regionDates.computeIfAbsent(_region, k -> new ArrayList<>()).add(_dateName);
     }
 
     private void ensurePath(String _path) {
