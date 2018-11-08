@@ -121,7 +121,7 @@ public class BaseRegionHandler implements RegionHandler {
                 String body = EntityUtils.toString(entity);
                 dayreportsHTML.add(body);
             }
-            pause(1000);
+            pause(100);
         }
 
         return dayreportsHTML;
