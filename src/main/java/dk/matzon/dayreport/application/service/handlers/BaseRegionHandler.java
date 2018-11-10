@@ -27,11 +27,9 @@ import javax.annotation.Nullable;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.function.Function;
-import java.util.stream.Collector;
 import java.util.stream.Collectors;
 
 import static java.util.Map.*;
-import static java.util.stream.Collectors.*;
 
 /**
  * Created by Brian Matzon <brian@matzon.dk>.
@@ -204,11 +202,11 @@ public class BaseRegionHandler implements RegionHandler {
 
             dayReportEntry.setRegion(_dayReport.getRegion());
 
-            processType(children.get(0), dayReportEntry);
-            processLocation(children.get(1), dayReportEntry);
-            processReported(children.get(2), dayReportEntry);
-            processOccurred(children.get(3), dayReportEntry);
-            processDescription(children.get(4), dayReportEntry);
+            processType(children.get(0).text(), dayReportEntry);
+            processLocation(children.get(1).text(), dayReportEntry);
+            processReported(children.get(2).text(), dayReportEntry);
+            processOccurred(children.get(3).text(), dayReportEntry);
+            processDescription(children.get(4).text(), dayReportEntry);
         } catch (Exception e) {
             String message = "Unable to process dayreport entry, probably unhandled format: " + _reportEntry;
             LOGGER.warn(message);
@@ -219,56 +217,53 @@ public class BaseRegionHandler implements RegionHandler {
         return dayReportEntry;
     }
 
-    private void processDescription(TextNode _textNode, DayReportEntry _dayReportEntry) {
+    private void processDescription(String _text, DayReportEntry _dayReportEntry) {
         try {
-            String value = _textNode.text();
-            _dayReportEntry.setDescription(value);
+            _dayReportEntry.setDescription(_text);
         } catch (Exception _e) {
-            LOGGER.warn("Exception occurred while processing description: " + _e.getMessage() + "[" + _textNode + "]", _e);
+            LOGGER.warn("Exception occurred while processing description: " + _e.getMessage() + "[" + _text + "]", _e);
         }
     }
 
-    private void processOccurred(TextNode _textNode, DayReportEntry _dayReportEntry) {
+    private void processOccurred(String _text, DayReportEntry _dayReportEntry) {
         try {
             SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy HH:mm");
 
-            String unformattedOccured = _textNode.text();
-            if (unformattedOccured.contains("-")) {
-                String unformattedOccuredSubstringStart = unformattedOccured.substring(unformattedOccured.indexOf(":") + 1, unformattedOccured.indexOf("-"));
+            if (_text.contains("-")) {
+                String unformattedOccuredSubstringStart = _text.substring(_text.indexOf(":") + 1, _text.indexOf("-"));
                 Date started = sdf.parse(unformattedOccuredSubstringStart.trim());
 
-                String unformattedOccuredSubstringEnd = unformattedOccured.substring(unformattedOccured.indexOf("-") + 1);
+                String unformattedOccuredSubstringEnd = _text.substring(_text.indexOf("-") + 1);
                 Date ended = sdf.parse(unformattedOccuredSubstringEnd.trim());
 
                 _dayReportEntry.setStarted(started);
                 _dayReportEntry.setEnded(ended);
             } else {
-                String unformattedOccuredSubstringStart = unformattedOccured.substring(unformattedOccured.indexOf(":") + 1);
+                String unformattedOccuredSubstringStart = _text.substring(_text.indexOf(":") + 1);
                 Date started = sdf.parse(unformattedOccuredSubstringStart.trim());
                 _dayReportEntry.setStarted(started);
             }
         } catch (Exception _e) {
-            LOGGER.warn("Exception occurred while processing occurred: " + _e.getMessage() + "[" + _textNode + "]", _e);
+            LOGGER.warn("Exception occurred while processing occurred: " + _e.getMessage() + "[" + _text + "]", _e);
         }
     }
 
-    private void processReported(TextNode _textNode, DayReportEntry _dayReportEntry) {
+    private void processReported(String _text, DayReportEntry _dayReportEntry) {
         try {
             SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy HH:mm");
 
-            String unformattedReported = _textNode.text();
-            String unformattedReportedSubstring = unformattedReported.substring(unformattedReported.indexOf(":") + 1);
+            String unformattedReportedSubstring = _text.substring(_text.indexOf(":") + 1);
             Date reported = sdf.parse(unformattedReportedSubstring.trim());
 
             _dayReportEntry.setReported(reported);
         } catch (Exception _e) {
-            LOGGER.warn("Exception occurred while processing reported: " + _e.getMessage() + "[" + _textNode + "]", _e);
+            LOGGER.warn("Exception occurred while processing reported: " + _e.getMessage() + "[" + _text + "]", _e);
         }
     }
 
-    private void processLocation(TextNode _textNode, DayReportEntry _dayReportEntry) {
+    protected void processLocation(String _text, DayReportEntry _dayReportEntry) {
         try {
-            String[] locationTokens = _textNode.text().split(" ");
+            String[] locationTokens = _text.split(" ");
 
             String zip = locationTokens[0].trim();
             _dayReportEntry.setZipCode(zip);
@@ -281,16 +276,15 @@ public class BaseRegionHandler implements RegionHandler {
                 _dayReportEntry.setLocation(location);
             }
         } catch (Exception _e) {
-            LOGGER.warn("Exception occurred while processing location: " + _e.getMessage() + "[" + _textNode + "]", _e);
+            LOGGER.warn("Exception occurred while processing location: " + _e.getMessage() + "[" + _text + "]", _e);
         }
     }
 
-    private void processType(TextNode _textNode, DayReportEntry _dayReportEntry) {
+    private void processType(String _text, DayReportEntry _dayReportEntry) {
         try {
-            String value = _textNode.text();
-            _dayReportEntry.setType(value);
+            _dayReportEntry.setType(_text);
         } catch (Exception _e) {
-            LOGGER.warn("Exception occurred while processing type: " + _e.getMessage() + "[" + _textNode + "]", _e);
+            LOGGER.warn("Exception occurred while processing type: " + _e.getMessage() + "[" + _text + "]", _e);
         }
     }
 
