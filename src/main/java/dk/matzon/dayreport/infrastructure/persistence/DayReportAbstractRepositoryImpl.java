@@ -1,10 +1,7 @@
 package dk.matzon.dayreport.infrastructure.persistence;
 
 import dk.matzon.dayreport.domain.Repository;
-import org.hibernate.HibernateException;
-import org.hibernate.Session;
-import org.hibernate.SessionFactory;
-import org.hibernate.Transaction;
+import org.hibernate.*;
 import org.hibernate.query.Query;
 
 import java.util.Collections;
