@@ -13,9 +13,9 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.io.IOException;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Properties;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
@@ -34,17 +34,21 @@ public class GeocodingServiceImpl implements GeocodingService {
 
     private ScheduledFuture<?> scheduledFuture;
 
-    private HashMap<String, GeocodingResult> geocodingResults;
+    private ConcurrentHashMap<String, GeocodingResult> geocodingResults;
 
-    public GeocodingServiceImpl(Properties _properties, DayReportEntryRepositoryImpl _dayReportEntryRepository, ScheduledExecutorService _scheduledExecutorService) {
+    public GeocodingServiceImpl(Properties _properties) {
         properties = _properties;
         context = new GeoApiContext().setApiKey(properties.getProperty("geocodingservice.apikey"))
                 .setConnectTimeout(5, TimeUnit.SECONDS)
                 .setReadTimeout(5, TimeUnit.SECONDS)
                 .setWriteTimeout(5, TimeUnit.SECONDS);
+    }
+
+    public GeocodingServiceImpl(Properties _properties, DayReportEntryRepositoryImpl _dayReportEntryRepository, ScheduledExecutorService _scheduledExecutorService) {
+        this(_properties);
         dayReportEntryRepository = _dayReportEntryRepository;
         scheduledExecutorService = _scheduledExecutorService;
-        geocodingResults = new HashMap<>();
+        geocodingResults = new ConcurrentHashMap<>();
     }
 
     @Override
@@ -105,23 +109,27 @@ public class GeocodingServiceImpl implements GeocodingService {
                     System.out.println("No result for address: " + address + ", performing lookup");
 
                     GeocodingResult[] geocodingResults = GeocodingApi.geocode(context, address).await();
-                    if (geocodingResults != null) {
+                    if (geocodingResults != null && geocodingResults.length > 0) {
                         geocodingResult = geocodingResults[0];
                         updateExistingMatch(city, zipCode, location, geocodingResult);
+                    } else {
+                        System.out.println("No match for " + address);
                     }
+                } else {
+                    System.out.println("Already cached value for zipcode: " + zipCode + ", city: " + city + ", location: " + location);
                 }
 
                 if (geocodingResult != null) {
-                    dayReportEntry.setLatitude((float) geocodingResult.geometry.location.lat);
-                    dayReportEntry.setLongtitude((float) geocodingResult.geometry.location.lng);
+                    dayReportEntry.setLatitude(geocodingResult.geometry.location.lat);
+                    dayReportEntry.setLongtitude(geocodingResult.geometry.location.lng);
                 }
 
                 Integer geocodeTries = dayReportEntry.getGeocodeTries();
-                if(geocodeTries == null) {
+                if (geocodeTries == null) {
                     geocodeTries = 0;
                 }
 
-                dayReportEntry.setGeocodeTries(geocodeTries+1);
+                dayReportEntry.setGeocodeTries(geocodeTries + 1);
                 dayReportEntryRepository.save(dayReportEntry);
             } catch (ApiException | InterruptedException | IOException _e) {
                 String message = "Exception occured while processing Geocode request for zipcode: " + zipCode + "city: " + city + ", location: " + location;
@@ -132,45 +140,52 @@ public class GeocodingServiceImpl implements GeocodingService {
 
     private void updateExistingMatch(String _city, String _zipCode, String _location, GeocodingResult _geocodingResult) {
 
-        if(existingMatch(_city, _zipCode, _location) != null) {
+        if (existingMatch(_city, _zipCode, _location) != null) {
             System.out.println("Not updating cache with existing: zipcode: " + _zipCode + ", city: " + _city + ", location: " + _location);
             return;
         }
 
         if (_location == null) {
             _location = "-";
-            geocodingResults.put(String.format("%s-%s-%s", _zipCode, _city, _location), _geocodingResult);
         }
-        geocodingResults.put(String.format("%s-%s", _zipCode, _city), _geocodingResult);
-        geocodingResults.put(String.format("%s", _zipCode), _geocodingResult);
 
-        String message = "Added GeocodingResult for zipcode: " + _zipCode + ", city: " + _city + ", location: " + _location;
+        String key = formatCacheKey(_zipCode, _city, _location);
+        geocodingResults.put(key, _geocodingResult);
+
+        String message = "Added GeocodingResult for zipcode: " + _zipCode + ", city: " + _city + ", location: " + _location + " lat: " + _geocodingResult.geometry.location.lat + ", lng: " + _geocodingResult.geometry.location.lng;
         LOGGER.info(message);
         System.out.println(message);
     }
 
     private GeocodingResult existingMatch(String _city, String _zipCode, String _location) {
-        GeocodingResult geocodingResult = null;
         if (_location == null) {
             _location = "-";
         }
-        String[] keys = new String[]{
-                String.format("%s-%s-%s", _zipCode, _city, _location),
-                String.format("%s-%s", _zipCode, _city),
-                String.format("%s", _zipCode)};
+        String key = formatCacheKey(_zipCode, _city, _location);
+        return geocodingResults.get(key);
+    }
 
-        for (String key : keys) {
-            geocodingResult = geocodingResults.get(key);
-            if (geocodingResult != null) {
-                return geocodingResult;
-            }
-        }
-        return null;
+    private String formatCacheKey(String _city, String _zipCode, String _location) {
+        return String.format("%s-%s-%s", _zipCode, _city, _location);
     }
 
     @Override
     public List<DayReportEntry> findFailingGeocodeEntries() {
         List<DayReportEntry> dayReportEntriesWithGeocodeErrorCount = dayReportEntryRepository.findDayReportEntriesWithGeocodeErrorCount(3);
         return dayReportEntriesWithGeocodeErrorCount;
+    }
+
+    public GeocodingResult[] lookup(String _zipCode, String _city, String _location) throws Exception {
+        // handle "empty" location
+        String geoLocation = _location;
+        if ("-".equals(geoLocation)) {
+            geoLocation = "";
+        } else {
+            geoLocation = ", " + geoLocation;
+        }
+
+        String address = String.format("%s, %s%s", _zipCode, _city, geoLocation);
+
+        return GeocodingApi.geocode(context, address).await();
     }
 }
