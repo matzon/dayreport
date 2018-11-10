@@ -42,8 +42,8 @@ public class DayReportEntry implements Serializable {
     @Column(length = 2048)
     private String description;
 
-    private Float latitude;
-    private Float longtitude;
+    private Double latitude;
+    private Double longtitude;
 
     private Integer geocodeTries = 0;
 
@@ -147,19 +147,19 @@ public class DayReportEntry implements Serializable {
         description = _description;
     }
 
-    public Float getLatitude() {
+    public Double getLatitude() {
         return latitude;
     }
 
-    public void setLatitude(Float _latitude) {
+    public void setLatitude(Double _latitude) {
         latitude = _latitude;
     }
 
-    public Float getLongtitude() {
+    public Double getLongtitude() {
         return longtitude;
     }
 
-    public void setLongtitude(Float _longtitude) {
+    public void setLongtitude(Double _longtitude) {
         longtitude = _longtitude;
     }
 
