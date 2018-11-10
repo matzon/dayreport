@@ -1,6 +1,5 @@
 package dk.matzon.dayreport.domain.model;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
@@ -14,6 +13,8 @@ import java.util.*;
 @Table(uniqueConstraints = {@UniqueConstraint(columnNames = {"date"}, name = "unique_day")})
 public class DayReport implements Serializable {
 
+    public static final Comparator<? super DayReport> DateComparator = Comparator.comparing(_o -> _o.date);
+    
     @Id
     @GeneratedValue(generator = "uuid2")
     @GenericGenerator(name = "uuid2", strategy = "uuid2")

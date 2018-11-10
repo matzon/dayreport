@@ -111,7 +111,9 @@ public class DayReportApp {
                 prepareShutdown();
                 break;
             case "gather":
-                dataGatherer.downloadData(null, null, Region.FYN);
+                Date sfrom = DateUtils.truncate(new Date(), Calendar.MONTH);
+                Date sto = DateUtils.addDays(sfrom, 1);
+                dataGatherer.downloadData(sfrom, sto, Region.FYN);
                 break;
             case "gathermonth":
                 Date from = DateUtils.truncate(new Date(), Calendar.MONTH);
@@ -125,8 +127,15 @@ public class DayReportApp {
                 System.out.println("Downloading reports from " + lmfrom + " to " + lmto);
                 dataGatherer.downloadData(lmfrom, lmto, region);
                 break;
+            case "gatherlyear":
+                Date lyfrom = DateUtils.addYears(DateUtils.truncate(new Date(), Calendar.MONTH), -1);
+                Date lyto = DateUtils.addYears(lyfrom, 1);
+                System.out.println("Downloading reports from " + lyfrom + " to " + lyto);
+                dataGatherer.downloadData(lyfrom, lyto, region);
+                break;
             case "list":
                 all = dayReportRepository.findAll();
+                all.sort(DayReport.DateComparator);
                 for (DayReport dayReport : all) {
                     System.out.println(dayReport);
                 }
@@ -156,6 +165,7 @@ public class DayReportApp {
                 break;
             case "geolookup":
                 geocodingService.processEntriesMissingGeocodeInformation();
+                break;
             case "geoerror":
                 List<DayReportEntry> failingGeocodeEntries = geocodingService.findFailingGeocodeEntries();
                 for (DayReportEntry failingGeocodeEntry : failingGeocodeEntries) {
@@ -173,6 +183,7 @@ public class DayReportApp {
         ObjectMapper objectMapper = new ObjectMapper();
 
         List<DayReport> all = dayReportRepository.findAll();
+        all.sort(DayReport.DateComparator);
         Map<Region, List<String>> regionDates = new HashMap<>();
         for (DayReport dayReport : all) {
             Date reportDate = dayReport.getDate();
